@@ -64,7 +64,6 @@ planning, UI/frontend development, backend/WebSocket logic, OpenAI integration, 
 
 ---
 
-## 7) Links to code, tests, documentation, and presentations
-- **Code (repo):** https://github.com/dionabou/ase285-chatgpt-clone
-- **Tests:** [add link/path if you have a tests folder or test report]  
-- **Presentation:** slides link + demo video link (if required)
+## 7) Links 
+- **Code (repo):** https://github.com/dionabou/ase285-chatgpt-clone  
+- **Presentation:** https://github.com/dionabou/ase285-chatgpt-clone/blob/main/docs%26presentation/PPP_ChatGPT_Clone.pdf
