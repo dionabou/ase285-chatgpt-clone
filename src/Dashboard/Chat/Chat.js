@@ -3,7 +3,16 @@ import Messages from "./Messages";
 import NewMessageInput from "./NewMessageInput";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 
-const Chat = ({ sidebarOpen, toggleSidebar, messages, input, onInputChange, onSend, onKeyDown }) => {
+const Chat = ({
+  sidebarOpen,
+  toggleSidebar,
+  messages,
+  input,
+  onInputChange,
+  onSend,
+  onKeyDown,
+  isThinking
+}) => {
   return (
     <div className="chat_container">
       <div className="chat_header">
@@ -13,7 +22,8 @@ const Chat = ({ sidebarOpen, toggleSidebar, messages, input, onInputChange, onSe
       </div>
 
       <div className="chat_selected_container">
-        <Messages messages={messages} />
+        <Messages messages={messages} isThinking={isThinking} />
+
         <NewMessageInput
           value={input}
           onChange={onInputChange}

@@ -2,7 +2,7 @@ import React from "react";
 import { GrUser } from "react-icons/gr";
 import { FcMindMap } from "react-icons/fc";
 
-const Message = ({ content, aiMessage }) => {
+const Message = ({ content, aiMessage, isThinking }) => {
   return (
     <div
       className="message_container"
@@ -11,7 +11,19 @@ const Message = ({ content, aiMessage }) => {
       <div className="message_avatar_container">
         {aiMessage ? <FcMindMap /> : <GrUser />}
       </div>
-      <p className="message_text">{content}</p>
+
+      {isThinking ? (
+        <div className="thinking_indicator">
+          <span className="thinking_spinner"></span>
+          <span className="thinking_dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </div>
+      ) : (
+        <p className="message_text">{content}</p>
+      )}
     </div>
   );
 };

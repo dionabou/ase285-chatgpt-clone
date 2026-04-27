@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [input, setInput] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isThinking, setIsThinking] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
@@ -32,16 +33,23 @@ export default function Dashboard() {
     const onNewSessionCreated = (id) => {
       setCurrentSessionId(id);
       setInput("");
+      setIsThinking(false);
+    };
+
+    const onMessageReceived = () => {
+      setIsThinking(false);
     };
 
     socket.on("sessions_data", onSessionsData);
     socket.on("new_session_created", onNewSessionCreated);
+    socket.on("message_received", onMessageReceived);
 
     socket.emit("get_sessions");
 
     return () => {
       socket.off("sessions_data", onSessionsData);
       socket.off("new_session_created", onNewSessionCreated);
+      socket.off("message_received", onMessageReceived);
     };
   }, []);
 
@@ -137,6 +145,7 @@ export default function Dashboard() {
 
     socket.emit("send_message", message);
     setInput("");
+    setIsThinking(true);
   };
 
   const startResize = () => {
@@ -176,6 +185,7 @@ export default function Dashboard() {
         onInputChange={setInput}
         onSend={handleSend}
         onKeyDown={(e) => e.key === "Enter" && handleSend()}
+        isThinking={isThinking}
       />
     </div>
   );
