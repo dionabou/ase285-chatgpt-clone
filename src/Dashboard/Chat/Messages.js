@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Message from "./Message";
 
 const Messages = ({ messages, isThinking }) => {
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth"
+    });
+  }, [messages, isThinking]);
+
   return (
     <div className="messages_container">
       {messages.map((message) => (
@@ -19,6 +27,8 @@ const Messages = ({ messages, isThinking }) => {
           isThinking={true}
         />
       )}
+
+      <div ref={bottomRef}></div>
     </div>
   );
 };

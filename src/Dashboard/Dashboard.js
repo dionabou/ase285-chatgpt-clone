@@ -4,7 +4,7 @@ import Chat from "./Chat/Chat";
 import "./dashboard.css";
 import socket from "../Client/socket";
 
-export default function Dashboard() {
+export default function Dashboard({ username, onLogout }) {
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [input, setInput] = useState("");
@@ -186,6 +186,8 @@ export default function Dashboard() {
         onSend={handleSend}
         onKeyDown={(e) => e.key === "Enter" && handleSend()}
         isThinking={isThinking}
+        username={username}
+        onLogout={onLogout}
       />
     </div>
   );
