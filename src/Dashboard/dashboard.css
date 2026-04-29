@@ -804,3 +804,14 @@
   color: white;
 }
 
+.file_attachment_preview {
+  width: 585px;
+  margin: 8px 0;
+  padding: 12px 14px;
+  background: #f1f1f1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  color: #202123;
+  font-size: 14px;
+}
+

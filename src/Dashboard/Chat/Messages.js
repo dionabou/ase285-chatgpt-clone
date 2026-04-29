@@ -19,12 +19,15 @@ const Messages = ({ messages, isThinking }) => {
       ) : (
         <>
           {messages.map((message) => (
-            <Message
-              key={message.id || message._id}   // ✅ FIXED
-              content={message.content}
-              aiMessage={message.sender !== "user"}
-            />
+           <Message
+  key={message.id || message._id}
+  content={message.content}
+  attachmentName={message.attachmentName}
+  aiMessage={message.sender !== "user"}
+/>
           ))}
+
+          
 
           {isThinking && (
             <Message content="" aiMessage={true} isThinking={true} />

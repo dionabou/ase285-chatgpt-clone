@@ -1,8 +1,9 @@
 import React from "react";
 import { GrUser } from "react-icons/gr";
 import { FcMindMap } from "react-icons/fc";
+import { FiPaperclip } from "react-icons/fi";
 
-const Message = ({ content, aiMessage, isThinking }) => {
+const Message = ({ content, aiMessage, isThinking, attachmentName }) => {
   const isImage =
     typeof content === "string" && content.startsWith("data:image");
 
@@ -23,6 +24,11 @@ const Message = ({ content, aiMessage, isThinking }) => {
             <span></span>
             <span></span>
           </span>
+        </div>
+      ) : attachmentName ? (
+        <div className="file_attachment_preview">
+          <FiPaperclip size={18} />
+          <span>{attachmentName}</span>
         </div>
       ) : isImage ? (
         <img src={content} alt="uploaded" className="message_image" />

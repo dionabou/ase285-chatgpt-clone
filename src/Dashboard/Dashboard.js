@@ -44,13 +44,13 @@ export default function Dashboard({ username, onLogout }) {
     socket.on("new_session_created", onNewSessionCreated);
     socket.on("message_received", onMessageReceived);
 
-  if (socket.connected) {
-  socket.emit("get_sessions");
-} else {
-  socket.once("connect", () => {
-    socket.emit("get_sessions");
-  });
-}
+    if (socket.connected) {
+      socket.emit("get_sessions");
+    } else {
+      socket.once("connect", () => {
+        socket.emit("get_sessions");
+      });
+    }
 
     return () => {
       socket.off("sessions_data", onSessionsData);
@@ -106,9 +106,9 @@ export default function Dashboard({ username, onLogout }) {
         (a.title || "New Chat").localeCompare(b.title || "New Chat")
       );
     } else if (sortType === "oldest") {
-      next.sort((a, b) => new Date(b._id) - new Date(a._id));
+      next.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     } else {
-     next.sort((a, b) => new Date(b._id) - new Date(a._id));
+      next.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     }
 
     next.sort((a, b) => Number(b.pinned) - Number(a.pinned));
@@ -119,43 +119,40 @@ export default function Dashboard({ username, onLogout }) {
   const currentSession =
     sessions.find((session) => session._id === currentSessionId) || null;
 
-
   const handleNewChat = () => {
-  if (!socket.connected) {
-    console.log("Socket is not connected");
-    return;
-  }
+    if (!socket.connected) {
+      console.log("Socket is not connected");
+      return;
+    }
 
-  socket.emit("new_session");
-};
+    socket.emit("new_session");
+  };
 
-const handleDeleteSession = (id) => {
-  setSessions((prev) => prev.filter((s) => s._id !== id)); 
-  socket.emit("delete_session", id);
-};
+  const handleDeleteSession = (id) => {
+    setSessions((prev) => prev.filter((s) => s._id !== id));
+    socket.emit("delete_session", id);
+  };
 
- const handleRenameSession = (id, title) => {
-  setSessions((prev) =>
-    prev.map((s) =>
-      s._id === id ? { ...s, title: title.trim() || "New Chat" } : s
-    )
-  );
+  const handleRenameSession = (id, title) => {
+    const nextTitle = title.trim() || "New Chat";
 
-  socket.emit("rename_session", {
-    id,
-    title: title.trim() || "New Chat"
-  });
-};
+    setSessions((prev) =>
+      prev.map((s) => (s._id === id ? { ...s, title: nextTitle } : s))
+    );
+
+    socket.emit("rename_session", {
+      id,
+      title: nextTitle
+    });
+  };
 
   const handleTogglePin = (id) => {
-  setSessions((prev) =>
-    prev.map((s) =>
-      s._id === id ? { ...s, pinned: !s.pinned } : s
-    )
-  );
+    setSessions((prev) =>
+      prev.map((s) => (s._id === id ? { ...s, pinned: !s.pinned } : s))
+    );
 
-  socket.emit("toggle_pin", id);
-};
+    socket.emit("toggle_pin", id);
+  };
 
   const handleSend = () => {
     const text = input.trim();
@@ -173,7 +170,6 @@ const handleDeleteSession = (id) => {
     setIsThinking(true);
   };
 
-  // ✅ FILE UPLOAD HANDLER (NEW)
   const handleFileUpload = async (file) => {
     if (!file || !currentSession) return;
 
@@ -188,11 +184,25 @@ const handleDeleteSession = (id) => {
 
       const data = await res.json();
 
+      if (!res.ok) {
+        console.error("Upload failed:", data);
+        return;
+      }
+
       const message = {
         id: Date.now(),
         sessionId: currentSession._id,
         sender: "user",
-        content: data.content
+
+        // Display stays clean
+        content: "",
+
+        // UI uses these for file card
+        attachmentName: data.filename,
+        attachmentType: data.mimetype,
+
+        // Backend/AI can still read this
+        fileContent: data.content
       };
 
       socket.emit("send_message", message);
@@ -242,7 +252,7 @@ const handleDeleteSession = (id) => {
         isThinking={isThinking}
         username={username}
         onLogout={onLogout}
-        onFileUpload={handleFileUpload}   
+        onFileUpload={handleFileUpload}
       />
     </div>
   );

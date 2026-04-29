@@ -62,11 +62,13 @@ const sessionSchema = new mongoose.Schema(
     title: { type: String, default: "New Chat" },
     pinned: { type: Boolean, default: false },
     messages: [
-      {
-        id: Number,
-        sender: String,
-        content: String
-      }
+     {
+  id: Number,
+  sender: String,
+  content: String,
+  attachmentName: String,
+  attachmentType: String
+}
     ]
   },
   { timestamps: true }
@@ -185,7 +187,11 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
     fs.unlinkSync(file.path);
 
-    res.json({ content });
+    res.json({
+  content,
+  filename: file.originalname,
+  mimetype: file.mimetype
+});
   } catch (err) {
     console.error("Upload error:", err);
     res.status(500).json({ error: "Upload failed" });
@@ -308,11 +314,15 @@ io.on("connection", (socket) => {
 
       if (!session) return;
 
+  
+
       const userMessage = {
-        id: payload.id || Date.now(),
-        sender: "user",
-        content: payload.content
-      };
+  id: payload.id || Date.now(),
+  sender: "user",
+  content: payload.content,
+  attachmentName: payload.attachmentName,
+  attachmentType: payload.attachmentType
+};
 
       session.messages.push(userMessage);
 
@@ -323,13 +333,15 @@ io.on("connection", (socket) => {
       await session.save();
       await sendUserSessions();
 
-      const response = await client.responses.create({
-        model: "gpt-5.2",
-        input: [
-          { role: "system", content: "You are a helpful AI assistant." },
-          { role: "user", content: payload.content }
-        ]
-      });
+   const aiInput = payload.fileContent || payload.content;
+
+const response = await client.responses.create({
+  model: "gpt-5.2",
+  input: [
+    { role: "system", content: "You are a helpful AI assistant." },
+    { role: "user", content: aiInput }
+  ]
+});
 
       const reply = {
         id: Date.now(),
