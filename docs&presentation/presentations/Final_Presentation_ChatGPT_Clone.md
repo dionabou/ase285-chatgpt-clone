@@ -60,42 +60,6 @@ MongoDB + OpenAI API
 - Backend handles auth, sockets, file processing, and AI requests
 - MongoDB stores user-specific sessions
 
----
-
-# Demo: Sign Up
-
-![Sign up screen](image.png))
-
----
-
-# Demo: Login
-
-![Login screen](image-1.png)
-
----
-
-# Demo: Dashboard
-
-![Dashboard screen](image-2.png)
-
----
-
-# Demo: Chat Management
-
-![Chat menu screen](image-3.png)
-
----
-
-# Demo: File Upload Preview
-
-![File upload preview](image-4.png)
-
----
-
-# Demo: File Picker
-
-![File picker screen](image-5.png)
-
 
 ---
 
@@ -142,7 +106,7 @@ Tests cover authentication, chat sessions, messaging, file uploads, search/filte
 # What Went Wrong
 
 - CORS issues during frontend/backend connection
-- React and Socket.IO had a learning curve
+- Socket.IO had a learning curve
 - OpenAI API setup caused delays
 - Learning Curve with Docker
 - Debugging Docker and MongoDB configuration took time
