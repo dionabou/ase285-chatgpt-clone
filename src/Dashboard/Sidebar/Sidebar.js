@@ -63,13 +63,17 @@ const Sidebar = ({
       className={`sidebar_container ${sidebarOpen ? "open" : "closed"}`}
       style={sidebarOpen ? { width: `${sidebarWidth}px` } : {}}
     >
-      <div className="sidebar_top">
-        <button className="sidebar_toggle" onClick={toggleSidebar}>
-          <HiOutlineMenuAlt2 size={20} color="white" />
-        </button>
+     <div className="sidebar_top">
+  <button className="sidebar_toggle" onClick={toggleSidebar}>
+    <HiOutlineMenuAlt2 size={22} color="white" />
+  </button>
 
-        {sidebarOpen && <NewChatButton onClick={onNewChat} />}
-      </div>
+  {sidebarOpen && (
+    <div className="new_chat_button_wrapper">
+      <NewChatButton onClick={onNewChat} />
+    </div>
+  )}
+</div>
 
       {sidebarOpen && (
         <div className="sidebar_search_row">
@@ -191,14 +195,14 @@ const Sidebar = ({
         ) : (
           sessions.map((session) => (
             <ListItem
-              key={session.id}
+              key={session._id}
               session={session}
-              active={session.id === currentSessionId}
+              active={session._id === currentSessionId}
               sidebarOpen={sidebarOpen}
-              onClick={() => onSelectSession(session.id)}
-              onDelete={() => onDeleteSession(session.id)}
-              onRename={(newTitle) => onRenameSession(session.id, newTitle)}
-              onTogglePin={() => onTogglePin(session.id)}
+              onClick={() => onSelectSession(session._id)}
+              onDelete={() => onDeleteSession(session._id)}
+              onRename={(newTitle) => onRenameSession(session._id, newTitle)}
+              onTogglePin={() => onTogglePin(session._id)}
             />
           ))
         )}

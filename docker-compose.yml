@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  server:
+    build: .
+    container_name: chat-server
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: npm run server
+
+volumes:
+  mongo-data:

@@ -11,24 +11,29 @@ function Signup({ onSwitchToLogin }) {
     setError("");
     setMessage("");
 
-    const res = await fetch("http://localhost:5000/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ username, password })
-    });
+    try {
+      const res = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      setError(data.message || "Signup failed.");
-      return;
+      if (!res.ok) {
+        setError(data.message || "Signup failed.");
+        return;
+      }
+
+      setMessage("Account created. You can now log in.");
+      setUsername("");
+      setPassword("");
+    } catch (err) {
+      console.error("Signup error:", err);
+      setError("Cannot connect to server. Make sure backend is running.");
     }
-
-    setMessage("Account created. You can now log in.");
-    setUsername("");
-    setPassword("");
   };
 
   return (
@@ -43,6 +48,7 @@ function Signup({ onSwitchToLogin }) {
           type="text"
           placeholder="Create username"
           value={username}
+          required
           onChange={(e) => setUsername(e.target.value)}
         />
 
@@ -50,6 +56,7 @@ function Signup({ onSwitchToLogin }) {
           type="password"
           placeholder="Create password"
           value={password}
+          required
           onChange={(e) => setPassword(e.target.value)}
         />
 

@@ -14,7 +14,8 @@ const Chat = ({
   onKeyDown,
   isThinking,
   username,
-  onLogout
+  onLogout,
+  onFileUpload
 }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -52,6 +53,7 @@ const Chat = ({
           onChange={onInputChange}
           onSend={onSend}
           onKeyDown={onKeyDown}
+          onFileUpload={onFileUpload}
         />
       </div>
     </div>

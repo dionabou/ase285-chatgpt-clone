@@ -25,8 +25,8 @@ export default function Dashboard({ username, onLogout }) {
 
       setCurrentSessionId((prev) => {
         if (!data.length) return null;
-        const stillExists = data.some((session) => session.id === prev);
-        return stillExists ? prev : data[0].id;
+        const stillExists = data.some((session) => session._id === prev);
+        return stillExists ? prev : data[0]._id;
       });
     };
 
@@ -44,7 +44,13 @@ export default function Dashboard({ username, onLogout }) {
     socket.on("new_session_created", onNewSessionCreated);
     socket.on("message_received", onMessageReceived);
 
+  if (socket.connected) {
+  socket.emit("get_sessions");
+} else {
+  socket.once("connect", () => {
     socket.emit("get_sessions");
+  });
+}
 
     return () => {
       socket.off("sessions_data", onSessionsData);
@@ -100,9 +106,9 @@ export default function Dashboard({ username, onLogout }) {
         (a.title || "New Chat").localeCompare(b.title || "New Chat")
       );
     } else if (sortType === "oldest") {
-      next.sort((a, b) => a.id - b.id);
+      next.sort((a, b) => new Date(b._id) - new Date(a._id));
     } else {
-      next.sort((a, b) => b.id - a.id);
+     next.sort((a, b) => new Date(b._id) - new Date(a._id));
     }
 
     next.sort((a, b) => Number(b.pinned) - Number(a.pinned));
@@ -111,26 +117,45 @@ export default function Dashboard({ username, onLogout }) {
   }, [sessions, searchTerm, filterType, sortType]);
 
   const currentSession =
-    sessions.find((session) => session.id === currentSessionId) || null;
+    sessions.find((session) => session._id === currentSessionId) || null;
+
 
   const handleNewChat = () => {
-    socket.emit("new_session");
-  };
+  if (!socket.connected) {
+    console.log("Socket is not connected");
+    return;
+  }
 
-  const handleDeleteSession = (id) => {
-    socket.emit("delete_session", id);
-  };
+  socket.emit("new_session");
+};
 
-  const handleRenameSession = (id, title) => {
-    socket.emit("rename_session", {
-      id,
-      title: title.trim() || "New Chat"
-    });
-  };
+const handleDeleteSession = (id) => {
+  setSessions((prev) => prev.filter((s) => s._id !== id)); 
+  socket.emit("delete_session", id);
+};
+
+ const handleRenameSession = (id, title) => {
+  setSessions((prev) =>
+    prev.map((s) =>
+      s._id === id ? { ...s, title: title.trim() || "New Chat" } : s
+    )
+  );
+
+  socket.emit("rename_session", {
+    id,
+    title: title.trim() || "New Chat"
+  });
+};
 
   const handleTogglePin = (id) => {
-    socket.emit("toggle_pin", id);
-  };
+  setSessions((prev) =>
+    prev.map((s) =>
+      s._id === id ? { ...s, pinned: !s.pinned } : s
+    )
+  );
+
+  socket.emit("toggle_pin", id);
+};
 
   const handleSend = () => {
     const text = input.trim();
@@ -138,7 +163,7 @@ export default function Dashboard({ username, onLogout }) {
 
     const message = {
       id: Date.now(),
-      sessionId: currentSession.id,
+      sessionId: currentSession._id,
       sender: "user",
       content: text
     };
@@ -146,6 +171,35 @@ export default function Dashboard({ username, onLogout }) {
     socket.emit("send_message", message);
     setInput("");
     setIsThinking(true);
+  };
+
+  // ✅ FILE UPLOAD HANDLER (NEW)
+  const handleFileUpload = async (file) => {
+    if (!file || !currentSession) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("http://127.0.0.1:5000/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      const message = {
+        id: Date.now(),
+        sessionId: currentSession._id,
+        sender: "user",
+        content: data.content
+      };
+
+      socket.emit("send_message", message);
+      setIsThinking(true);
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
   };
 
   const startResize = () => {
@@ -188,6 +242,7 @@ export default function Dashboard({ username, onLogout }) {
         isThinking={isThinking}
         username={username}
         onLogout={onLogout}
+        onFileUpload={handleFileUpload}   
       />
     </div>
   );

@@ -9,22 +9,27 @@ function Login({ onLogin, onSwitchToSignup }) {
     e.preventDefault();
     setError("");
 
-    const res = await fetch("http://localhost:5000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ username, password })
-    });
+    try {
+      const res = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      setError(data.message || "Login failed.");
-      return;
+      if (!res.ok) {
+        setError(data.message || "Login failed.");
+        return;
+      }
+
+      onLogin(data.username, data.token);
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Cannot connect to server. Make sure backend is running.");
     }
-
-    onLogin(data.username, data.token);
   };
 
   return (
@@ -38,6 +43,7 @@ function Login({ onLogin, onSwitchToSignup }) {
           type="text"
           placeholder="Username"
           value={username}
+          required
           onChange={(e) => setUsername(e.target.value)}
         />
 
@@ -45,6 +51,7 @@ function Login({ onLogin, onSwitchToSignup }) {
           type="password"
           placeholder="Password"
           value={password}
+          required
           onChange={(e) => setPassword(e.target.value)}
         />
 

@@ -12,23 +12,27 @@ const Messages = ({ messages, isThinking }) => {
 
   return (
     <div className="messages_container">
-      {messages.map((message) => (
-        <Message
-          key={message.id}
-          content={message.content}
-          aiMessage={message.sender !== "user"}
-        />
-      ))}
+      {messages.length === 0 && !isThinking ? (
+        <div className="empty_chat_container">
+          <h1>How can I help you today?</h1>
+        </div>
+      ) : (
+        <>
+          {messages.map((message) => (
+            <Message
+              key={message.id || message._id}   // ✅ FIXED
+              content={message.content}
+              aiMessage={message.sender !== "user"}
+            />
+          ))}
 
-      {isThinking && (
-        <Message
-          content=""
-          aiMessage={true}
-          isThinking={true}
-        />
+          {isThinking && (
+            <Message content="" aiMessage={true} isThinking={true} />
+          )}
+
+          <div ref={bottomRef}></div>
+        </>
       )}
-
-      <div ref={bottomRef}></div>
     </div>
   );
 };

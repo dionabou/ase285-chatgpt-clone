@@ -3,6 +3,9 @@ import { GrUser } from "react-icons/gr";
 import { FcMindMap } from "react-icons/fc";
 
 const Message = ({ content, aiMessage, isThinking }) => {
+  const isImage =
+    typeof content === "string" && content.startsWith("data:image");
+
   return (
     <div
       className="message_container"
@@ -21,6 +24,8 @@ const Message = ({ content, aiMessage, isThinking }) => {
             <span></span>
           </span>
         </div>
+      ) : isImage ? (
+        <img src={content} alt="uploaded" className="message_image" />
       ) : (
         <p className="message_text">{content}</p>
       )}
